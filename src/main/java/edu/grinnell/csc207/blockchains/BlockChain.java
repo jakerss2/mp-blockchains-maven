@@ -3,7 +3,8 @@ package edu.grinnell.csc207.blockchains;
 /**
  * A full blockchain.
  *
- * @author Your Name Here
+ * @author Benjamin Sheeley
+ * @author Jake Bell
  */
 public class BlockChain {
   // +--------+------------------------------------------------------

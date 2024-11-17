@@ -3,13 +3,24 @@ package edu.grinnell.csc207.blockchains;
 /**
  * Blocks to be stored in blockchains.
  *
- * @author Your Name Here
+ * @author Benjamin Sheeley
+ * @author Jake Bell
  * @author Samuel A. Rebelsky
  */
 class Block {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
+
+  Hash prevHash;
+
+  Hash currentHash;
+
+  int index;
+
+  Transaction blockData;
+
+  long nonce;
 
   // +--------------+------------------------------------------------
   // | Constructors |
@@ -30,7 +41,10 @@ class Block {
    *   The validator used to check the block.
    */
   Block(int num, Transaction transaction, Hash prevHash, HashValidator check) {
-    // STUB
+    this.index = num;
+    this.blockData = transaction;
+    this.prevHash = prevHash;
+    computeHash();
   } // Block(int, Transaction, Hash, HashValidator)
 
   /**
@@ -46,7 +60,11 @@ class Block {
    *   The nonce of the block.
    */
   Block(int num, Transaction transaction, Hash prevHash, long nonce) {
-    // STUB
+    this.index = num;
+    this.blockData = transaction;
+    this.prevHash = prevHash;
+    this.nonce = nonce;
+    computeHash();
   } // Block(int, Transaction, Hash, long)
 
   // +---------+-----------------------------------------------------
@@ -71,7 +89,7 @@ class Block {
    * @return the number of the block.
    */
   int getNum() {
-    return 0;   // STUB
+    return this.index;
   } // getNum()
 
   /**
@@ -80,7 +98,7 @@ class Block {
    * @return the transaction.
    */
   Transaction getTransaction() {
-    return new Transaction("Here", "There", 0); // STUB
+    return this.blockData;
   } // getTransaction()
 
   /**
@@ -89,7 +107,7 @@ class Block {
    * @return the nonce.
    */
   long getNonce() {
-    return 0;   // STUB
+    return this.nonce;
   } // getNonce()
 
   /**
@@ -98,7 +116,7 @@ class Block {
    * @return the hash of the previous block.
    */
   Hash getPrevHash() {
-    return new Hash(new byte[] {0});  // STUB
+    return this.prevHash;
   } // getPrevHash
 
   /**
@@ -107,7 +125,7 @@ class Block {
    * @return the hash of the current block.
    */
   Hash getHash() {
-    return new Hash(new byte[] {0});  // STUB
+    return this.currentHash;
   } // getHash
 
   /**
@@ -116,6 +134,12 @@ class Block {
    * @return a string representation of the block.
    */
   public String toString() {
-    return "";  // STUB
+    return "Block " + this.index + 
+    " (Transaction: [Source " + this.blockData.getSource() +
+    ", Target " + this.blockData.getTarget() +
+    ", Amount " + this.blockData.getAmount() +
+    "], Nonce: " + this.nonce +
+    ", prevHash: " + this.prevHash.toString() +
+    ", hash: " + this.currentHash.toString() + ")";
   } // toString()
 } // class Block
