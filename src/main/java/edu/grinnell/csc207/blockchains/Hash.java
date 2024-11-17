@@ -1,15 +1,21 @@
 package edu.grinnell.csc207.blockchains;
 
+import java.util.Arrays;
+
 /**
  * Encapsulated hashes.
  *
- * @author Your Name Here
+ * @author Jacob Bell
+ * @author Ben Sheeley
  * @author Samuel A. Rebelsky
  */
 public class Hash {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
+
+  /** The hash stored */
+  byte[] hashData;
 
   // +--------------+------------------------------------------------
   // | Constructors |
@@ -22,7 +28,7 @@ public class Hash {
    *   The data to copy into the hash.
    */
   public Hash(byte[] data) {
-    // STUB
+    this.hashData = data;
   } // Hash(byte[])
 
   // +---------+-----------------------------------------------------
@@ -35,7 +41,7 @@ public class Hash {
    * @return the number of bytes in the hash.
    */
   public int length() {
-    return 0;   // STUB
+    return this.hashData.length;
   } // length()
 
   /**
@@ -48,7 +54,7 @@ public class Hash {
    * @return the ith byte
    */
   public byte get(int i) {
-    return 0;   // STUB
+    return this.hashData[i];
   } // get()
 
   /**
@@ -58,7 +64,9 @@ public class Hash {
    * @return a copy of the bytes in the hash.
    */
   public byte[] getBytes() {
-    return new byte[] {1, 2, 3, 4, 5};      // STUB
+    byte[] arrCpy = new byte[this.length()];
+    System.arraycopy(this.hashData, 0, arrCpy, 0, this.length());
+    return arrCpy;
   } // getBytes()
 
   /**
@@ -67,7 +75,11 @@ public class Hash {
    * @return the hash as a hex string.
    */
   public String toString() {
-    return "";          // STUB
+    String str = "";
+    for (byte byt : this.hashData) {
+      str += String.format("%02X", Byte.toUnsignedInt(byt));
+    }
+    return str;
   } // toString()
 
   /**
@@ -80,6 +92,10 @@ public class Hash {
    *   otherwise.
    */
   public boolean equals(Object other) {
+    if (other instanceof Hash) {
+        Hash o = (Hash)other;
+        return Arrays.equals(this.hashData, o.hashData);
+    }
     return false;       // STUB
   } // equals(Object)
 
