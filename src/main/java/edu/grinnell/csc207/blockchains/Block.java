@@ -7,7 +7,7 @@ package edu.grinnell.csc207.blockchains;
  * @author Jake Bell
  * @author Samuel A. Rebelsky
  */
-class Block {
+public class Block {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
@@ -75,7 +75,7 @@ class Block {
    * Compute the hash of the block given all the other info already
    * stored in the block.
    */
-  void computeHash() {
+  static void computeHash() {
     // STUB
   } // computeHash()
 
