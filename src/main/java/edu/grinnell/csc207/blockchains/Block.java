@@ -1,5 +1,9 @@
 package edu.grinnell.csc207.blockchains;
 
+import java.security.*;
+import java.util.Random;
+import java.nio.ByteBuffer;
+
 /**
  * Blocks to be stored in blockchains.
  *
@@ -12,17 +16,17 @@ public class Block {
   // | Fields |
   // +--------+
 
-  Hash prevHash;
+  private Hash prevHash;
 
-  Hash currentHash;
+  private Hash currentHash;
 
-  int index;
+  private int index;
 
-  Transaction blockData;
+  private Transaction blockData;
 
-  long nonce;
+  private long nonce;
 
-  HashValidator checker;
+  private HashValidator checker;
 
   // +--------------+------------------------------------------------
   // | Constructors |
@@ -113,7 +117,7 @@ public class Block {
    *
    * @return the number of the block.
    */
-  int getNum() {
+  public int getNum() {
     return this.index;
   } // getNum()
 
@@ -122,7 +126,7 @@ public class Block {
    *
    * @return the transaction.
    */
-  Transaction getTransaction() {
+  public Transaction getTransaction() {
     return this.blockData;
   } // getTransaction()
 
@@ -131,7 +135,7 @@ public class Block {
    *
    * @return the nonce.
    */
-  long getNonce() {
+  public long getNonce() {
     return this.nonce;
   } // getNonce()
 
@@ -140,7 +144,7 @@ public class Block {
    *
    * @return the hash of the previous block.
    */
-  Hash getPrevHash() {
+  public Hash getPrevHash() {
     return this.prevHash;
   } // getPrevHash
 
@@ -149,7 +153,7 @@ public class Block {
    *
    * @return the hash of the current block.
    */
-  Hash getHash() {
+  public Hash getHash() {
     return this.currentHash;
   } // getHash
 
