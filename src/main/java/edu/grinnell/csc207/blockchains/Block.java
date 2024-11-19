@@ -77,7 +77,7 @@ class Block {
       this.blockData = transaction;
       this.prevHash = prevHash;
       this.nonce = nonce;
-      this.checker = null;
+      this.checker = (h) -> true;
       computeHash();
     } catch (NoSuchAlgorithmException e) {
       System.err.println("Algorithm not found (should never happen)");
@@ -101,12 +101,12 @@ class Block {
     md.update(ByteBuffer.allocate(Integer.BYTES).putInt(this.blockData.getAmount()).array());
     md.update(this.prevHash.getBytes());
     md.update(ByteBuffer.allocate(Long.BYTES).putLong(this.nonce).array());
-    currentHash = new Hash(md.digest());
-    while (currentHash.toString().startsWith("000")) {
+    this.currentHash = new Hash(md.digest());
+    while (!this.checker.isValid(currentHash)) {
       this.nonce = rand.nextLong();
       md.update(ByteBuffer.allocate(Long.BYTES).putLong(this.nonce).array());
-      currentHash = new Hash(md.digest());
-    }
+      this.currentHash = new Hash(md.digest());
+    } //while
   } // computeHash()
 
   // +---------+-----------------------------------------------------
