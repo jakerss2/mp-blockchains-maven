@@ -1,10 +1,5 @@
 package edu.grinnell.csc207.blockchains;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.nio.ByteBuffer;
-import java.util.Random;
-
 /**
  * Blocks to be stored in blockchains.
  *
@@ -12,7 +7,7 @@ import java.util.Random;
  * @author Jake Bell
  * @author Samuel A. Rebelsky
  */
-class Block {
+public class Block {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
