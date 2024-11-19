@@ -27,6 +27,9 @@ public class Block {
   private long nonce;
 
   private HashValidator checker;
+  
+  private MessageDigest md;
+
 
   // +--------------+------------------------------------------------
   // | Constructors |
@@ -47,12 +50,19 @@ public class Block {
    *   The validator used to check the block.
    */
   Block(int num, Transaction transaction, Hash prevHash, HashValidator check) {
+    Random rand = new Random();
     try {
+      this.md = MessageDigest.getInstance("sha-256");
       this.index = num;
       this.blockData = transaction;
       this.prevHash = prevHash;
       this.checker = check;
       computeHash();
+      while (!this.checker.isValid(currentHash)) {
+        this.nonce = rand.nextLong();
+        md.update(ByteBuffer.allocate(Long.BYTES).putLong(this.nonce).array());
+        this.currentHash = new Hash(md.digest());
+      } //while
     } catch (NoSuchAlgorithmException e) {
       System.err.println("Algorithm not found (should never happen)");
     } //try/catch
@@ -71,12 +81,12 @@ public class Block {
    *   The nonce of the block.
    */
   Block(int num, Transaction transaction, Hash prevHash, long nonce) {
-    try {
+    try { 
+      this.md = MessageDigest.getInstance("sha-256");
       this.index = num;
       this.blockData = transaction;
       this.prevHash = prevHash;
       this.nonce = nonce;
-      this.checker = (h) -> true;
       computeHash();
     } catch (NoSuchAlgorithmException e) {
       System.err.println("Algorithm not found (should never happen)");
@@ -92,20 +102,13 @@ public class Block {
    * stored in the block.
    */
   void computeHash() throws NoSuchAlgorithmException {
-    Random rand = new Random();
-    MessageDigest md = MessageDigest.getInstance("sha-256");
-    md.update(ByteBuffer.allocate(Integer.BYTES).putInt(this.index).array());
-    md.update(this.blockData.getSource().getBytes());
-    md.update(this.blockData.getTarget().getBytes());
-    md.update(ByteBuffer.allocate(Integer.BYTES).putInt(this.blockData.getAmount()).array());
-    md.update(this.prevHash.getBytes());
-    md.update(ByteBuffer.allocate(Long.BYTES).putLong(this.nonce).array());
+    this.md.update(ByteBuffer.allocate(Integer.BYTES).putInt(this.index).array());
+    this.md.update(this.blockData.getSource().getBytes());
+    this.md.update(this.blockData.getTarget().getBytes());
+    this.md.update(ByteBuffer.allocate(Integer.BYTES).putInt(this.blockData.getAmount()).array());
+    this.md.update(this.prevHash.getBytes());
+    this.md.update(ByteBuffer.allocate(Long.BYTES).putLong(this.nonce).array());
     this.currentHash = new Hash(md.digest());
-    while (!this.checker.isValid(currentHash)) {
-      this.nonce = rand.nextLong();
-      md.update(ByteBuffer.allocate(Long.BYTES).putLong(this.nonce).array());
-      this.currentHash = new Hash(md.digest());
-    } //while
   } // computeHash()
 
   // +---------+-----------------------------------------------------
