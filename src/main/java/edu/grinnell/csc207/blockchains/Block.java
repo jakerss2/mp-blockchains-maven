@@ -1,5 +1,10 @@
 package edu.grinnell.csc207.blockchains;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.nio.ByteBuffer;
+import java.util.Random;
+
 /**
  * Blocks to be stored in blockchains.
  *
@@ -22,6 +27,8 @@ class Block {
 
   long nonce;
 
+  HashValidator checker;
+
   // +--------------+------------------------------------------------
   // | Constructors |
   // +--------------+
@@ -41,10 +48,15 @@ class Block {
    *   The validator used to check the block.
    */
   Block(int num, Transaction transaction, Hash prevHash, HashValidator check) {
-    this.index = num;
-    this.blockData = transaction;
-    this.prevHash = prevHash;
-    computeHash();
+    try {
+      this.index = num;
+      this.blockData = transaction;
+      this.prevHash = prevHash;
+      this.checker = check;
+      computeHash();
+    } catch (NoSuchAlgorithmException e) {
+      System.err.println("Algorithm not found (should never happen)");
+    } //try/catch
   } // Block(int, Transaction, Hash, HashValidator)
 
   /**
@@ -60,11 +72,16 @@ class Block {
    *   The nonce of the block.
    */
   Block(int num, Transaction transaction, Hash prevHash, long nonce) {
-    this.index = num;
-    this.blockData = transaction;
-    this.prevHash = prevHash;
-    this.nonce = nonce;
-    computeHash();
+    try {
+      this.index = num;
+      this.blockData = transaction;
+      this.prevHash = prevHash;
+      this.nonce = nonce;
+      this.checker = null;
+      computeHash();
+    } catch (NoSuchAlgorithmException e) {
+      System.err.println("Algorithm not found (should never happen)");
+    } //try/catch
   } // Block(int, Transaction, Hash, long)
 
   // +---------+-----------------------------------------------------
@@ -75,8 +92,21 @@ class Block {
    * Compute the hash of the block given all the other info already
    * stored in the block.
    */
-  void computeHash() {
-    // STUB
+  void computeHash() throws NoSuchAlgorithmException {
+    Random rand = new Random();
+    MessageDigest md = MessageDigest.getInstance("sha-256");
+    md.update(ByteBuffer.allocate(Integer.BYTES).putInt(this.index).array());
+    md.update(this.blockData.getSource().getBytes());
+    md.update(this.blockData.getTarget().getBytes());
+    md.update(ByteBuffer.allocate(Integer.BYTES).putInt(this.blockData.getAmount()).array());
+    md.update(this.prevHash.getBytes());
+    md.update(ByteBuffer.allocate(Long.BYTES).putLong(this.nonce).array());
+    currentHash = new Hash(md.digest());
+    while (currentHash.toString().startsWith("000")) {
+      this.nonce = rand.nextLong();
+      md.update(ByteBuffer.allocate(Long.BYTES).putLong(this.nonce).array());
+      currentHash = new Hash(md.digest());
+    }
   } // computeHash()
 
   // +---------+-----------------------------------------------------
