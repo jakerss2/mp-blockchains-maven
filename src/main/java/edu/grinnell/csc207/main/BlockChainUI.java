@@ -4,6 +4,7 @@ import edu.grinnell.csc207.blockchains.Block;
 import edu.grinnell.csc207.blockchains.BlockChain;
 import edu.grinnell.csc207.blockchains.HashValidator;
 import edu.grinnell.csc207.blockchains.Transaction;
+import edu.grinnell.csc207.blockchains.Node;
 
 import edu.grinnell.csc207.util.IOUtils;
 
@@ -131,11 +132,15 @@ public class BlockChainUI {
           break;
 
         case "remove":
-          pen.printf("Command '%s' is not yet implemented", command);
+          chain.removeLast();
+          pen.println("Last value in blockchain removed");
           break;
 
         case "transactions":
-          pen.printf("Command '%s' is not yet implemented", command);
+          Node currentNode = chain.firstNode; 
+          while(chain.users().hasNext()) {
+            currentNode.getData().getTransaction().toString();
+          }
           break;
 
         case "users":

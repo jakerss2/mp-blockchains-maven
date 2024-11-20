@@ -13,6 +13,7 @@ public class BlockChain implements Iterable<Transaction> {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
+  public Node firstNode;
 
   // +--------------+------------------------------------------------
   // | Constructors |
