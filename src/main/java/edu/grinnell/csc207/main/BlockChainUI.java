@@ -144,11 +144,26 @@ public class BlockChainUI {
           break;
 
         case "users":
-          pen.printf("Command '%s' is not yet implemented", command);
+          currentNode = chain.firstNode;
+          String nameCheckOne;
+          String nameCheckTwo;
+          String longNameString = "";
+          while(chain.users().hasNext()) {
+            nameCheckOne = currentNode.getData().getTransaction().getSource();
+            nameCheckTwo = currentNode.getData().getTransaction().getTarget();
+            if (!(longNameString.contains(nameCheckOne))) {
+              pen.println(nameCheckOne + "\n");
+              longNameString.concat(nameCheckOne);
+            }
+            if (!longNameString.contains(nameCheckTwo)) {
+              pen.println(nameCheckTwo + "\n");
+              longNameString.concat(nameCheckTwo);
+            }
+          }
           break;
 
         default:
-          pen.printf("invalid command: '%s'. Try again.\n", command);
+          pen.println("invalid command entered, please try again");
           break;
       } // switch
     } // while
