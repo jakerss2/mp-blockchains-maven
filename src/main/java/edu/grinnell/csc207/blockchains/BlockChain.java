@@ -13,6 +13,7 @@ public class BlockChain implements Iterable<Transaction> {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
+  public Node firstNode;
 
   // +--------------+------------------------------------------------
   // | Constructors |
@@ -31,6 +32,12 @@ public class BlockChain implements Iterable<Transaction> {
   // +---------+-----------------------------------------------------
   // | Helpers |
   // +---------+
+
+  /** The element at the front of the BlockChain */
+  private Node head;
+
+  /** The element at the back of the BlockChain */
+  private Node tail;
 
   // +---------+-----------------------------------------------------
   // | Methods |
@@ -114,7 +121,10 @@ public class BlockChain implements Iterable<Transaction> {
    *   If things are wrong at any block.
    */
   public void check() throws Exception {
-    // STUB
+    Iterator<Block> blockIter = blocks();
+    while (blockIter.hasNext()) {
+      
+    }
   } // check()
 
   /**
@@ -125,12 +135,30 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public Iterator<String> users() {
     return new Iterator<String>() {
+      /** Keep track of the current node of the iterator */
+      private Node current = head;
+
+      /** Keep track if we are at the source or target */
+      private boolean shownSource = false;
+
       public boolean hasNext() {
-        return false;   // STUB
+        return (current.nextNode != null);
       } // hasNext()
 
       public String next() {
-        throw new NoSuchElementException();     // STUB
+        if (!hasNext()) {
+          throw new NoSuchElementException();
+        }
+        if (shownSource) {
+          String name = current.blockData.getTransaction().getSource();
+          current = current.nextNode;
+          shownSource = true;
+          return name;
+        }
+        String name = current.blockData.getTransaction().getTarget();
+        current = current.nextNode;
+        shownSource = false;
+        return name;
       } // next()
     };
   } // users()
@@ -144,7 +172,15 @@ public class BlockChain implements Iterable<Transaction> {
    * @return that user's balance (or 0, if the user is not in the system).
    */
   public int balance(String user) {
-    return 0;   // STUB
+    int userBalance = 0;
+    for (Transaction obj : this) {
+      if (obj.getSource().equals(user)) {
+        userBalance += obj.getAmount();
+      } else if (obj.getSource().equals(user)) {
+        userBalance -= obj.getAmount();
+      }
+    }
+    return userBalance;
   } // balance()
 
   /**
@@ -154,12 +190,20 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public Iterator<Block> blocks() {
     return new Iterator<Block>() {
+      /** Keep track of the current node for iterator */
+      private Node current = head;
+
       public boolean hasNext() {
-        return false;   // STUB
+        return (current.nextNode != null);
       } // hasNext()
 
       public Block next() {
-        throw new NoSuchElementException();     // STUB
+        if (!hasNext()) {
+        throw new NoSuchElementException();
+        }
+        Block data = current.blockData;
+        current = current.nextNode;
+        return data;
       } // next()
     };
   } // blocks()
@@ -171,14 +215,21 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public Iterator<Transaction> iterator() {
     return new Iterator<Transaction>() {
+      /** Keep track of the current node for iterator */
+      private Node current = head;
+
       public boolean hasNext() {
-        return false;   // STUB
+        return (current.nextNode != null);
       } // hasNext()
 
       public Transaction next() {
-        throw new NoSuchElementException();     // STUB
+        if (!hasNext()) {
+        throw new NoSuchElementException();
+        }
+        Transaction data = current.blockData.getTransaction();
+        current = current.nextNode;
+        return data;
       } // next()
     };
   } // iterator()
-
 } // class BlockChain
