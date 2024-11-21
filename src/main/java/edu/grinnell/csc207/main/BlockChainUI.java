@@ -4,6 +4,7 @@ import edu.grinnell.csc207.blockchains.Block;
 import edu.grinnell.csc207.blockchains.BlockChain;
 import edu.grinnell.csc207.blockchains.HashValidator;
 import edu.grinnell.csc207.blockchains.Transaction;
+import edu.grinnell.csc207.blockchains.Node;
 
 import edu.grinnell.csc207.util.IOUtils;
 
@@ -131,19 +132,38 @@ public class BlockChainUI {
           break;
 
         case "remove":
-          pen.printf("Command '%s' is not yet implemented", command);
+          chain.removeLast();
+          pen.println("Last value in blockchain removed");
           break;
 
         case "transactions":
-          pen.printf("Command '%s' is not yet implemented", command);
+          Node currentNode = chain.firstNode; 
+          while(chain.users().hasNext()) {
+            currentNode.getData().getTransaction().toString();
+          }
           break;
 
         case "users":
-          pen.printf("Command '%s' is not yet implemented", command);
+          currentNode = chain.firstNode;
+          String nameCheckOne;
+          String nameCheckTwo;
+          String longNameString = "";
+          while(chain.users().hasNext()) {
+            nameCheckOne = currentNode.getData().getTransaction().getSource();
+            nameCheckTwo = currentNode.getData().getTransaction().getTarget();
+            if (!(longNameString.contains(nameCheckOne))) {
+              pen.println(nameCheckOne + "\n");
+              longNameString.concat(nameCheckOne);
+            }
+            if (!longNameString.contains(nameCheckTwo)) {
+              pen.println(nameCheckTwo + "\n");
+              longNameString.concat(nameCheckTwo);
+            }
+          }
           break;
 
         default:
-          pen.printf("invalid command: '%s'. Try again.\n", command);
+          pen.println("invalid command entered, please try again");
           break;
       } // switch
     } // while

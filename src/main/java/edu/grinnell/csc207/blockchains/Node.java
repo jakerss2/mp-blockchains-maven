@@ -8,11 +8,16 @@ public class Node {
 
   Node prevNode;
 
-  Block blockData;
+  private Block blockData;
 
   public Node(Node prev, Node next, Block data) {
     this.prevNode = prev;
     this.blockData = data;
     this.nextNode = next;
   } //Node
+
+  //methods
+  public Block getData() {
+    return blockData;
+  }
 } //Node
