@@ -124,7 +124,7 @@ public class BlockChain implements Iterable<Transaction> {
     Iterator<Block> blockIter = blocks();
     while (blockIter.hasNext()) {
       
-    }
+    } //while
   } // check()
 
   /**
@@ -148,14 +148,14 @@ public class BlockChain implements Iterable<Transaction> {
       public String next() {
         if (!hasNext()) {
           throw new NoSuchElementException();
-        }
+        } //if
         if (shownSource) {
-          String name = current.blockData.getTransaction().getSource();
+          String name = current.getData().getTransaction().getSource();
           current = current.nextNode;
           shownSource = true;
           return name;
-        }
-        String name = current.blockData.getTransaction().getTarget();
+        } //if
+        String name = current.getData().getTransaction().getTarget();
         current = current.nextNode;
         shownSource = false;
         return name;
@@ -178,8 +178,8 @@ public class BlockChain implements Iterable<Transaction> {
         userBalance += obj.getAmount();
       } else if (obj.getSource().equals(user)) {
         userBalance -= obj.getAmount();
-      }
-    }
+      } //if
+    } //for
     return userBalance;
   } // balance()
 
@@ -199,9 +199,9 @@ public class BlockChain implements Iterable<Transaction> {
 
       public Block next() {
         if (!hasNext()) {
-        throw new NoSuchElementException();
-        }
-        Block data = current.blockData;
+          throw new NoSuchElementException();
+        } // if
+        Block data = current.getData();
         current = current.nextNode;
         return data;
       } // next()
@@ -224,9 +224,9 @@ public class BlockChain implements Iterable<Transaction> {
 
       public Transaction next() {
         if (!hasNext()) {
-        throw new NoSuchElementException();
-        }
-        Transaction data = current.blockData.getTransaction();
+          throw new NoSuchElementException();
+        } //if
+        Transaction data = current.getData().getTransaction();
         current = current.nextNode;
         return data;
       } // next()

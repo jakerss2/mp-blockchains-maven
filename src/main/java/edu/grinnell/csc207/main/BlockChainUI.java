@@ -137,10 +137,10 @@ public class BlockChainUI {
           break;
 
         case "transactions":
-          Node currentNode = chain.firstNode; 
-          while(chain.users().hasNext()) {
+          Node currentNode = chain.firstNode;
+          while (chain.users().hasNext()) {
             currentNode.getData().getTransaction().toString();
-          }
+          } //while
           break;
 
         case "users":
@@ -148,18 +148,18 @@ public class BlockChainUI {
           String nameCheckOne;
           String nameCheckTwo;
           String longNameString = "";
-          while(chain.users().hasNext()) {
+          while (chain.users().hasNext()) {
             nameCheckOne = currentNode.getData().getTransaction().getSource();
             nameCheckTwo = currentNode.getData().getTransaction().getTarget();
             if (!(longNameString.contains(nameCheckOne))) {
               pen.println(nameCheckOne + "\n");
               longNameString.concat(nameCheckOne);
-            }
+            } //if
             if (!longNameString.contains(nameCheckTwo)) {
               pen.println(nameCheckTwo + "\n");
               longNameString.concat(nameCheckTwo);
-            }
-          }
+            } //if
+          } //while
           break;
 
         default:
