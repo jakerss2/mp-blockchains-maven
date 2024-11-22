@@ -215,13 +215,13 @@ public class BlockChain implements Iterable<Transaction> {
       public String next() {
         if (!hasNext()) {
           throw new NoSuchElementException();
-        }
+        } //if
         if (shownSource) {
           String name = current.getData().getTransaction().getSource();
           current = current.nextNode;
           shownSource = true;
           return name;
-        }
+        } //if
         String name = current.getData().getTransaction().getTarget();
         current = current.nextNode;
         shownSource = false;
@@ -245,8 +245,8 @@ public class BlockChain implements Iterable<Transaction> {
         userBalance += obj.getAmount();
       } else if (obj.getSource().equals(user)) {
         userBalance -= obj.getAmount();
-      }
-    }
+      } //if
+    } //for
     return userBalance;
   } // balance()
 
@@ -266,8 +266,8 @@ public class BlockChain implements Iterable<Transaction> {
 
       public Block next() {
         if (!hasNext()) {
-        throw new NoSuchElementException();
-        }
+          throw new NoSuchElementException();
+        } // if
         Block data = current.getData();
         current = current.nextNode;
         return data;
@@ -293,7 +293,7 @@ public class BlockChain implements Iterable<Transaction> {
         if (!hasNext()) {
         throw new NoSuchElementException();
         }
-        Transaction data = current.getData().getTransaction();
+        Transaction data = current.blockData.getTransaction();
         current = current.nextNode;
         return data;
       } // next()

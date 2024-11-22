@@ -14,7 +14,9 @@ public class Hash {
   // | Fields |
   // +--------+
 
-  /** The hash stored */
+  /**
+   * The hash stored.
+   */
   byte[] hashData;
 
   // +--------------+------------------------------------------------
@@ -78,7 +80,7 @@ public class Hash {
     String str = "";
     for (byte byt : this.hashData) {
       str += String.format("%02X", Byte.toUnsignedInt(byt));
-    }
+    } //for
     return str;
   } // toString()
 
@@ -93,10 +95,10 @@ public class Hash {
    */
   public boolean equals(Object other) {
     if (other instanceof Hash) {
-        Hash o = (Hash)other;
-        return Arrays.equals(this.hashData, o.hashData);
-    }
-    return false;       // STUB
+      Hash o = (Hash) other;
+      return Arrays.equals(this.hashData, o.hashData);
+    } //if
+    return false;
   } // equals(Object)
 
   /**
