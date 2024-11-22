@@ -3,6 +3,10 @@ package edu.grinnell.csc207.blockchains;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import javax.swing.text.html.HTMLDocument;
+
+import edu.grinnell.csc207.util.AssociativeArray;
+
 /**
  * A full blockchain.
  *
@@ -15,6 +19,18 @@ public class BlockChain implements Iterable<Transaction> {
   // +--------+
   public Node firstNode;
 
+  /** The element at the front of the BlockChain */
+  private Node head;
+
+  /** The element at the back of the BlockChain */
+  private Node tail;
+
+  /** The validator for the BlockChain */
+  private HashValidator validator;
+
+  /** Keep track of the length of the BlockChain */
+  private int size;
+
   // +--------------+------------------------------------------------
   // | Constructors |
   // +--------------+
@@ -26,18 +42,15 @@ public class BlockChain implements Iterable<Transaction> {
    *   The validator used to check elements.
    */
   public BlockChain(HashValidator check) {
-    // STUB
+    this.validator = check;
+    this.head = null;
+    this.tail = null;
+    this.size = 0;
   } // BlockChain(HashValidator)
 
   // +---------+-----------------------------------------------------
   // | Helpers |
   // +---------+
-
-  /** The element at the front of the BlockChain */
-  private Node head;
-
-  /** The element at the back of the BlockChain */
-  private Node tail;
 
   // +---------+-----------------------------------------------------
   // | Methods |
@@ -53,7 +66,7 @@ public class BlockChain implements Iterable<Transaction> {
    * @return a new block with correct number, hashes, and such.
    */
   public Block mine(Transaction t) {
-    return new Block(10, t, new Hash(new byte[] {7}), 11);       // STUB
+    return new Block(this.size, t, this.tail.getData().getPrevHash(), this.validator);
   } // mine(Transaction)
 
   /**
@@ -62,7 +75,7 @@ public class BlockChain implements Iterable<Transaction> {
    * @return the number of blocks in the chain, including the initial block.
    */
   public int getSize() {
-    return 2;   // STUB
+    return this.size;
   } // getSize()
 
   /**
@@ -76,7 +89,19 @@ public class BlockChain implements Iterable<Transaction> {
    *   hash is incorrect.
    */
   public void append(Block blk) {
-    // STUB
+    Block blockCopy = new Block(blk.getNum(), blk.getTransaction(), blk.getHash(), blk.getNonce());
+
+    if (this.validator.isValid(blk.getHash())) {
+      throw new IllegalArgumentException();
+    } else if (!blk.getHash().equals(blockCopy.getHash())) {
+      throw new IllegalArgumentException();
+    } else if (!blk.getPrevHash().equals(this.tail.getData().getHash())) {
+      throw new IllegalArgumentException();
+    } else {
+      Node newNode = new Node(this.tail, null, blk);
+      this.tail.nextNode = newNode;
+      this.size++;
+    }
   } // append()
 
   /**
@@ -87,7 +112,12 @@ public class BlockChain implements Iterable<Transaction> {
    *   is removed).
    */
   public boolean removeLast() {
-    return true;        // STUB
+    if (this.size == 1) {
+      return false;
+    } // if
+    this.tail = this.tail.prevNode;
+    this.size--;
+    return true;
   } // removeLast()
 
   /**
@@ -96,7 +126,7 @@ public class BlockChain implements Iterable<Transaction> {
    * @return the hash of the last sblock in the chain.
    */
   public Hash getHash() {
-    return new Hash(new byte[] {2, 0, 7});   // STUB
+    return this.tail.getData().getHash();
   } // getHash()
 
   /**
@@ -108,7 +138,12 @@ public class BlockChain implements Iterable<Transaction> {
    * @return true if the blockchain is correct and false otherwise.
    */
   public boolean isCorrect() {
-    return true;        // STUB
+    try {
+      this.check();
+    } catch (Exception e) {
+      return false;
+    }
+    return true;
   } // isCorrect()
 
   /**
@@ -122,9 +157,41 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public void check() throws Exception {
     Iterator<Block> blockIter = blocks();
-    while (blockIter.hasNext()) {
-      
-    }
+    AssociativeArray arr = new AssociativeArray<String, Integer>();
+    Block prevBlock = null;
+    while(blockIter.hasNext()) {
+      Block curBlock = blockIter.next();
+      Transaction curTrans = curBlock.getTransaction();
+      if (!(curTrans.getSource().equals(""))) {
+        try {
+          arr.set(curTrans.getSource(), (int)arr.get(curTrans.getTarget()) - curTrans.getAmount());
+          if ((int) arr.get(curTrans.getTarget()) < 0) {
+            throw new Exception();
+          }
+        } catch (Exception e) {
+          throw new Exception();
+        } // try/catch
+      } // if
+      try {
+        arr.set(curTrans.getTarget(), (int)arr.get(curTrans.getTarget()) + curTrans.getAmount());
+      } catch (Exception e) {
+        arr.set(curTrans.getTarget(), curTrans.getAmount());
+      } // try/catch
+      Block dupBlock = new Block(curBlock.getNum(), curBlock.getTransaction(), curBlock.getHash(), curBlock.getNonce());
+      if (!curBlock.getHash().equals(dupBlock.getHash())){
+        throw new Exception();
+      } // if
+
+      if (!this.validator.isValid(curBlock.getHash())) {
+        throw new Exception();
+      }
+      if (prevBlock != null) {
+        if (!prevBlock.getHash().equals(curBlock.getPrevHash())) {
+          throw new Exception();
+        } // if
+      } // if
+      prevBlock = curBlock;
+    } // while
   } // check()
 
   /**
@@ -150,12 +217,12 @@ public class BlockChain implements Iterable<Transaction> {
           throw new NoSuchElementException();
         }
         if (shownSource) {
-          String name = current.blockData.getTransaction().getSource();
+          String name = current.getData().getTransaction().getSource();
           current = current.nextNode;
           shownSource = true;
           return name;
         }
-        String name = current.blockData.getTransaction().getTarget();
+        String name = current.getData().getTransaction().getTarget();
         current = current.nextNode;
         shownSource = false;
         return name;
@@ -201,7 +268,7 @@ public class BlockChain implements Iterable<Transaction> {
         if (!hasNext()) {
         throw new NoSuchElementException();
         }
-        Block data = current.blockData;
+        Block data = current.getData();
         current = current.nextNode;
         return data;
       } // next()
@@ -226,7 +293,7 @@ public class BlockChain implements Iterable<Transaction> {
         if (!hasNext()) {
         throw new NoSuchElementException();
         }
-        Transaction data = current.blockData.getTransaction();
+        Transaction data = current.getData().getTransaction();
         current = current.nextNode;
         return data;
       } // next()
