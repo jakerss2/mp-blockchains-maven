@@ -363,11 +363,11 @@ public class TestBlockChain {
     chain.check();
 
     Block block = chain.mine(new Transaction("", "A", 100));
-    block.transaction = new Transaction("", "A", 1000);
+    block.blockData = new Transaction("", "A", 1000);
     assertAppendFails(chain, block, "Appending block with modified amount");
 
     block = chain.mine(new Transaction("", "A", 100));
-    block.transaction = new Transaction("", "B", 100);
+    block.blockData = new Transaction("", "B", 100);
     assertAppendFails(chain, block, "Appending block with modified recipient");
 
     block = chain.mine(new Transaction("", "A", 100));
@@ -457,7 +457,7 @@ public class TestBlockChain {
 
     Iterator<Block> blocks = chain.blocks();
     blocks.next();
-    blocks.next().transaction = new Transaction("", "F", 1000);
+    blocks.next().blockData = new Transaction("", "F", 1000);
     assertEquals(1010, chain.balance("F"), "F's balance in modified chain");
     assertFalse(chain.isCorrect(), "modified chain is incorrect");
     assertCheckFails(chain, "modified chain is incorrect");
