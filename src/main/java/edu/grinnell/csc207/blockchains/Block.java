@@ -1,8 +1,9 @@
 package edu.grinnell.csc207.blockchains;
 
-import java.security.*;
-import java.util.Random;
 import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 
 /**
  * Blocks to be stored in blockchains.
@@ -16,19 +17,37 @@ public class Block {
   // | Fields |
   // +--------+
 
+  /** The hash of the previous given block */
   private Hash prevHash;
 
+  /** The hash of the current block */
   private Hash currentHash;
 
+  /** The index of the block in the BlockChain */
   private int index;
 
-  private Transaction blockData;
+  /** The transaction in this given block. */
+  public Transaction blockData;
 
-  private long nonce;
+  /** 
+   * The number that help give it a unique hash 
+   * that meets our validators standards
+  */
+  public long nonce;
 
+ /** Our hash must follow a certain pattern according to the given HashValidator */
   private HashValidator checker;
   
+  /** What will encode our hashes */
   private MessageDigest md;
+
+  /** The hash without nonce */
+  private byte[] baseHash;
+
+  static ByteBuffer intBuffer = ByteBuffer.allocate(Integer.BYTES);
+
+  static ByteBuffer longBuffer = ByteBuffer.allocate(Long.BYTES);
+
 
 
   // +--------------+------------------------------------------------
@@ -57,11 +76,11 @@ public class Block {
       this.blockData = transaction;
       this.prevHash = prevHash;
       this.checker = check;
-      computeHash();
+      computeBase();
+      this.currentHash = new Hash(new byte[0]);
       while (!this.checker.isValid(currentHash)) {
         this.nonce = rand.nextLong();
-        md.update(ByteBuffer.allocate(Long.BYTES).putLong(this.nonce).array());
-        this.currentHash = new Hash(md.digest());
+        computeHash();
       } //while
     } catch (NoSuchAlgorithmException e) {
       System.err.println("Algorithm not found (should never happen)");
@@ -80,13 +99,14 @@ public class Block {
    * @param nonce
    *   The nonce of the block.
    */
-  Block(int num, Transaction transaction, Hash prevHash, long nonce) {
+  public Block(int num, Transaction transaction, Hash prevHash, long nonce) {
     try { 
       this.md = MessageDigest.getInstance("sha-256");
       this.index = num;
       this.blockData = transaction;
       this.prevHash = prevHash;
       this.nonce = nonce;
+      computeBase();
       computeHash();
     } catch (NoSuchAlgorithmException e) {
       System.err.println("Algorithm not found (should never happen)");
@@ -102,14 +122,23 @@ public class Block {
    * stored in the block.
    */
   void computeHash() throws NoSuchAlgorithmException {
-    this.md.update(ByteBuffer.allocate(Integer.BYTES).putInt(this.index).array());
-    this.md.update(this.blockData.getSource().getBytes());
-    this.md.update(this.blockData.getTarget().getBytes());
-    this.md.update(ByteBuffer.allocate(Integer.BYTES).putInt(this.blockData.getAmount()).array());
-    this.md.update(this.prevHash.getBytes());
-    this.md.update(ByteBuffer.allocate(Long.BYTES).putLong(this.nonce).array());
+    this.md.reset();
+    this.md.update(this.baseHash);
+    longBuffer.clear();
+    this.md.update(longBuffer.putLong(this.nonce).array());
     this.currentHash = new Hash(md.digest());
   } // computeHash()
+
+  void computeBase() {
+    intBuffer.clear();
+    this.md.update(intBuffer.putInt(this.index).array());
+    this.md.update(this.blockData.getSource().getBytes());
+    this.md.update(this.blockData.getTarget().getBytes());
+    intBuffer.clear();
+    this.md.update(intBuffer.putInt(this.blockData.getAmount()).array());
+    this.md.update(this.prevHash.getBytes());
+    this.baseHash = this.md.digest();
+  } // computeBase()
 
   // +---------+-----------------------------------------------------
   // | Methods |
