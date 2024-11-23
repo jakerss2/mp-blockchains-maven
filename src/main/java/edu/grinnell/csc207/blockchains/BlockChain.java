@@ -3,8 +3,6 @@ package edu.grinnell.csc207.blockchains;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import javax.swing.text.html.HTMLDocument;
-
 import edu.grinnell.csc207.util.AssociativeArray;
 
 /**
@@ -18,16 +16,16 @@ public class BlockChain implements Iterable<Transaction> {
   // | Fields |
   // +--------+
 
-  /** The element at the front of the BlockChain */
-  public Node head;
+  /** The element at the front of the BlockChain. */
+  private Node head;
 
-  /** The element at the back of the BlockChain */
+  /** The element at the back of the BlockChain. */
   private Node tail;
 
-  /** The validator for the BlockChain */
+  /** The validator for the BlockChain. */
   private HashValidator validator;
 
-  /** Keep track of the length of the BlockChain */
+  /** Keep track of the length of the BlockChain. */
   private int size;
 
   // +--------------+------------------------------------------------
@@ -46,7 +44,7 @@ public class BlockChain implements Iterable<Transaction> {
     byte[] initByte = new byte[0];
     Hash initHash = new Hash(initByte);
     Block initBlock = new Block(0, initTrans, initHash, this.validator);
-    Node initNode = new Node (null, null, initBlock);
+    Node initNode = new Node(null, null, initBlock);
     this.head = initNode;
     this.tail = initNode;
     this.size = 1;
@@ -93,20 +91,22 @@ public class BlockChain implements Iterable<Transaction> {
    *   hash is incorrect.
    */
   public void append(Block blk) {
-    Block blockCopy = new Block(blk.getNum(), blk.getTransaction(), blk.getPrevHash(), blk.getNonce());
+    Block blockCopy = new Block(blk.getNum(), blk.getTransaction(),
+        blk.getPrevHash(), blk.getNonce());
 
     if (!this.validator.isValid(blk.getHash())) {
       throw new IllegalArgumentException("Invalid hash in appended block: " + blk.getHash());
     } else if (!blk.getHash().equals(blockCopy.getHash())) {
       throw new IllegalArgumentException("Invalid hash in appended block: " + blk.getHash());
     } else if (!blk.getPrevHash().equals(this.tail.getData().getHash())) {
-      throw new IllegalArgumentException("Does not match the previous hash: " + this.tail.getData().getHash() + " was " + blk.getPrevHash());
+      throw new IllegalArgumentException("Does not match the previous hash: "
+          + this.tail.getData().getHash() + " was " + blk.getPrevHash());
     } else {
       Node newNode = new Node(this.tail, null, blk);
       this.tail.nextNode = newNode;
       this.tail = newNode;
       this.size++;
-    }
+    } // if/else
   } // append()
 
   /**
@@ -165,7 +165,7 @@ public class BlockChain implements Iterable<Transaction> {
     Iterator<Block> blockIter = blocks();
     AssociativeArray arr = new AssociativeArray<String, Integer>();
     Block prevBlock = null;
-    while(blockIter.hasNext()) {
+    while (blockIter.hasNext()) {
       Block curBlock = blockIter.next();
       Transaction curTrans = curBlock.getTransaction();
       if (curTrans.getAmount() < 0) {
@@ -174,23 +174,25 @@ public class BlockChain implements Iterable<Transaction> {
       } // if
       if (!(curTrans.getSource().equals(""))) {
         try {
-          arr.set(curTrans.getSource(), (int)arr.get(curTrans.getSource()) - curTrans.getAmount());
+          arr.set(curTrans.getSource(), (int) arr.get(curTrans.getSource()) - curTrans.getAmount());
           if ((int) arr.get(curTrans.getSource()) < 0) {
             throw new Exception("Insufficient funds for " + curTrans.getSource() + " in "
-                + curBlock.getNum() + ": Has " + (int)arr.get(curTrans.getSource()) + " needs "
+                + curBlock.getNum() + ": Has " + (int) arr.get(curTrans.getSource()) + " needs "
                 + curTrans.getAmount());
           } // if
         } catch (Exception e) {
-          throw new Exception("Unknown Source in block " + curBlock.getNum() + ": " + curTrans.getSource());
+          throw new Exception("Unknown Source in block "
+              + curBlock.getNum() + ": " + curTrans.getSource());
         } // try/catch
       } // if
       try {
-        arr.set(curTrans.getTarget(), (int)arr.get(curTrans.getTarget()) + curTrans.getAmount());
+        arr.set(curTrans.getTarget(), (int) arr.get(curTrans.getTarget()) + curTrans.getAmount());
       } catch (Exception e) {
         arr.set(curTrans.getTarget(), curTrans.getAmount());
       } // try/catch
-      Block dupBlock = new Block(curBlock.getNum(), curBlock.getTransaction(), curBlock.getPrevHash(), curBlock.getNonce());
-      if (!curBlock.getHash().equals(dupBlock.getHash())){
+      Block dupBlock = new Block(curBlock.getNum(), curBlock.getTransaction(),
+          curBlock.getPrevHash(), curBlock.getNonce());
+      if (!curBlock.getHash().equals(dupBlock.getHash())) {
         throw new Exception("Hash is not correct in block " + curBlock.getNum());
       } // if
 
@@ -199,7 +201,8 @@ public class BlockChain implements Iterable<Transaction> {
       } // if
       if (prevBlock != null) {
         if (!prevBlock.getHash().equals(curBlock.getPrevHash())) {
-          throw new Exception("The previous hash stored in " + curBlock.getNum() + " is not correct");
+          throw new Exception("The previous hash stored in "
+              + curBlock.getNum() + " is not correct");
         } // if
       } // if
       prevBlock = curBlock;
@@ -229,10 +232,10 @@ public class BlockChain implements Iterable<Transaction> {
           while (current != null) {
             String sourceName = current.getData().getTransaction().getSource();
             String targetName = current.getData().getTransaction().getTarget();
-            if(!(sourceName.equals(""))) {
+            if (!(sourceName.equals(""))) {
               tmpArr.set(sourceName, true);
             } // if
-            if(!(targetName.equals(""))) {
+            if (!(targetName.equals(""))) {
               tmpArr.set(targetName, true);
             } // if
             current = current.nextNode;
@@ -315,8 +318,8 @@ public class BlockChain implements Iterable<Transaction> {
 
       public Transaction next() {
         if (!hasNext()) {
-        throw new NoSuchElementException();
-        }
+          throw new NoSuchElementException();
+        } // if
         Transaction data = current.getData().getTransaction();
         current = current.nextNode;
         return data;
