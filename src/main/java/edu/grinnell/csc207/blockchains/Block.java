@@ -17,35 +17,37 @@ public class Block {
   // | Fields |
   // +--------+
 
-  /** The hash of the previous given block */
+  /** The hash of the previous given block. */
   private Hash prevHash;
 
-  /** The hash of the current block */
+  /** The hash of the current block. */
   private Hash currentHash;
 
-  /** The index of the block in the BlockChain */
+  /** The index of the block in the BlockChain. */
   private int index;
 
   /** The transaction in this given block. */
-  public Transaction blockData;
+  private Transaction blockData;
 
-  /** 
-   * The number that help give it a unique hash 
-   * that meets our validators standards
+  /**
+   * The number that help give it a unique hash
+   * that meets our validators standards.
   */
-  public long nonce;
+  private long nonce;
 
- /** Our hash must follow a certain pattern according to the given HashValidator */
+ /** Our hash must follow a certain pattern according to the given HashValidator. */
   private HashValidator checker;
-  
-  /** What will encode our hashes */
+
+  /** What will encode our hashes. */
   private MessageDigest md;
 
-  /** The hash without nonce */
+  /** The hash without nonce. */
   private byte[] baseHash;
 
+  /** ByteBuffer for the integers. */
   static ByteBuffer intBuffer = ByteBuffer.allocate(Integer.BYTES);
 
+  /** ByteBuffer for the longs. */
   static ByteBuffer longBuffer = ByteBuffer.allocate(Long.BYTES);
 
 
@@ -63,18 +65,18 @@ public class Block {
    *   The number of the block.
    * @param transaction
    *   The transaction for the block.
-   * @param prevHash
+   * @param prevBlockHash
    *   The hash of the previous block.
    * @param check
    *   The validator used to check the block.
    */
-  Block(int num, Transaction transaction, Hash prevHash, HashValidator check) {
+  Block(int num, Transaction transaction, Hash prevBlockHash, HashValidator check) {
     Random rand = new Random();
     try {
       this.md = MessageDigest.getInstance("sha-256");
       this.index = num;
       this.blockData = transaction;
-      this.prevHash = prevHash;
+      this.prevHash = prevBlockHash;
       this.checker = check;
       computeBase();
       this.currentHash = new Hash(new byte[0]);
@@ -94,18 +96,18 @@ public class Block {
    *   The number of the block.
    * @param transaction
    *   The transaction for the block.
-   * @param prevHash
+   * @param prevBlockHash
    *   The hash of the previous block.
-   * @param nonce
+   * @param blockNonce
    *   The nonce of the block.
    */
-  public Block(int num, Transaction transaction, Hash prevHash, long nonce) {
-    try { 
+  public Block(int num, Transaction transaction, Hash prevBlockHash, long blockNonce) {
+    try {
       this.md = MessageDigest.getInstance("sha-256");
       this.index = num;
       this.blockData = transaction;
-      this.prevHash = prevHash;
-      this.nonce = nonce;
+      this.prevHash = prevBlockHash;
+      this.nonce = blockNonce;
       computeBase();
       computeHash();
     } catch (NoSuchAlgorithmException e) {
@@ -129,6 +131,10 @@ public class Block {
     this.currentHash = new Hash(md.digest());
   } // computeHash()
 
+  /**
+   * Compute the base hash to refrain from repeatedly
+   * remaking it in computerHash().
+   */
   void computeBase() {
     intBuffer.clear();
     this.md.update(intBuffer.putInt(this.index).array());
@@ -195,12 +201,12 @@ public class Block {
    * @return a string representation of the block.
    */
   public String toString() {
-    return "Block " + this.index + 
-    " (Transaction: [Source " + this.blockData.getSource() +
-    ", Target " + this.blockData.getTarget() +
-    ", Amount " + this.blockData.getAmount() +
-    "], Nonce: " + this.nonce +
-    ", prevHash: " + this.prevHash.toString() +
-    ", hash: " + this.currentHash.toString() + ")";
+    return "Block " + this.index
+      + " (Transaction: [Source " + this.blockData.getSource()
+      + ", Target " + this.blockData.getTarget()
+      + ", Amount " + this.blockData.getAmount()
+      + "], Nonce: " + this.nonce
+      + ", prevHash: " + this.prevHash.toString()
+      + ", hash: " + this.currentHash.toString() + ")";
   } // toString()
 } // class Block
