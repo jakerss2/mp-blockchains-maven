@@ -30,7 +30,9 @@ public class Hash {
    *   The data to copy into the hash.
    */
   public Hash(byte[] data) {
-    this.hashData = data;
+    byte[] dataCopy = new byte[data.length];
+    System.arraycopy(data, 0, dataCopy, 0, data.length);
+    this.hashData = dataCopy;
   } // Hash(byte[])
 
   // +---------+-----------------------------------------------------
