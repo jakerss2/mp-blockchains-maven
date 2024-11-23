@@ -293,7 +293,7 @@ public class BlockChain implements Iterable<Transaction> {
         if (!hasNext()) {
         throw new NoSuchElementException();
         }
-        Transaction data = current.blockData.getTransaction();
+        Transaction data = current.getData().getTransaction();
         current = current.nextNode;
         return data;
       } // next()
