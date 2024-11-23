@@ -1,16 +1,15 @@
 package edu.grinnell.csc207.main;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.Iterator;
+
 import edu.grinnell.csc207.blockchains.Block;
 import edu.grinnell.csc207.blockchains.BlockChain;
 import edu.grinnell.csc207.blockchains.HashValidator;
 import edu.grinnell.csc207.blockchains.Transaction;
-import edu.grinnell.csc207.blockchains.Node;
-
 import edu.grinnell.csc207.util.IOUtils;
-
-import java.io.PrintWriter;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 /**
  * A simple UI for our BlockChain class.
@@ -26,7 +25,7 @@ public class BlockChainUI {
   /**
    * The number of bytes we validate. Should be set to 3 before submitting.
    */
-  static final int VALIDATOR_BYTES = 0;
+  static final int VALIDATOR_BYTES = 3;
 
   // +---------+-----------------------------------------------------
   // | Helpers |
@@ -88,7 +87,9 @@ public class BlockChainUI {
 
     String source;
     String target;
+    String user;
     int amount;
+    long nonce;
 
     while (!done) {
       pen.print("\nCommand: ");
@@ -100,19 +101,40 @@ public class BlockChainUI {
 
       switch (command.toLowerCase()) {
         case "append":
-          pen.printf("Command '%s' is not yet implemented", command);
+          source = IOUtils.readLine(pen, eyes, "Source (return for deposit): ");
+          target = IOUtils.readLine(pen, eyes, "Target: ");
+          amount = IOUtils.readInt(pen, eyes, "Amount: ");
+          nonce = IOUtils.readLong(pen, eyes, "Nonce: ");
+          Block newBlock = new Block(chain.getSize(),
+              (new Transaction(source, target, amount)), chain.getHash(), nonce);
+          try {
+            chain.append(newBlock);
+          } catch (Exception e) {
+            pen.println("Could not append: " + e.getMessage());
+          } // try/catch
+          pen.println("Appended: " + newBlock.toString());
           break;
 
         case "balance":
-          pen.printf("Command '%s' is not yet implemented", command);
+          user = IOUtils.readLine(pen, eyes, "User: ");
+          int balance = chain.balance(user);
+          pen.println(user + "'s balance is " + balance);
           break;
 
         case "blocks":
-          pen.printf("Command '%s' is not yet implemented", command);
+          Iterator<Block> blocks = chain.blocks();
+          while (blocks.hasNext()) {
+            pen.println(blocks.next().toString());
+          } //while
           break;
 
         case "check":
-          pen.printf("Command '%s' is not yet implemented", command);
+          try {
+            chain.check();
+            pen.println("The blockchain checks out.");
+          } catch (Exception e) {
+            pen.println(e.getMessage());
+          } // try/catch
           break;
 
         case "help":
@@ -124,7 +146,7 @@ public class BlockChainUI {
           target = IOUtils.readLine(pen, eyes, "Target: ");
           amount = IOUtils.readInt(pen, eyes, "Amount: ");
           Block b = chain.mine(new Transaction(source, target, amount));
-          pen.println("Nonce: " + b.getNonce());
+          pen.println("Use nonce: " + b.getNonce());
           break;
 
         case "quit":
@@ -137,28 +159,15 @@ public class BlockChainUI {
           break;
 
         case "transactions":
-          Node currentNode = chain.firstNode;
-          while (chain.users().hasNext()) {
-            currentNode.getData().getTransaction().toString();
-          } //while
+          for (Transaction obj : chain) {
+            pen.println(obj.toString());
+          } // for
           break;
 
         case "users":
-          currentNode = chain.firstNode;
-          String nameCheckOne;
-          String nameCheckTwo;
-          String longNameString = "";
-          while (chain.users().hasNext()) {
-            nameCheckOne = currentNode.getData().getTransaction().getSource();
-            nameCheckTwo = currentNode.getData().getTransaction().getTarget();
-            if (!(longNameString.contains(nameCheckOne))) {
-              pen.println(nameCheckOne + "\n");
-              longNameString.concat(nameCheckOne);
-            } //if
-            if (!longNameString.contains(nameCheckTwo)) {
-              pen.println(nameCheckTwo + "\n");
-              longNameString.concat(nameCheckTwo);
-            } //if
+          Iterator<String> users = chain.users();
+          while (users.hasNext()) {
+            pen.println(users.next());
           } //while
           break;
 
