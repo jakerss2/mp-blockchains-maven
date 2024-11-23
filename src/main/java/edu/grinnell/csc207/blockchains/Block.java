@@ -27,13 +27,13 @@ public class Block {
   private int index;
 
   /** The transaction in this given block. */
-  private Transaction blockData;
+  public Transaction blockData;
 
   /**
    * The number that help give it a unique hash
    * that meets our validators standards.
   */
-  private long nonce;
+  public long nonce;
 
  /** Our hash must follow a certain pattern according to the given HashValidator. */
   private HashValidator checker;
