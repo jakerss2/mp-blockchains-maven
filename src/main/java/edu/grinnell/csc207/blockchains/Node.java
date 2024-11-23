@@ -34,7 +34,7 @@ public class Node {
     this.prevNode = prev;
     this.blockData = data;
     this.nextNode = next;
-  } //Node
+  } // Node(prev, next, data)
 
   //methods
 
