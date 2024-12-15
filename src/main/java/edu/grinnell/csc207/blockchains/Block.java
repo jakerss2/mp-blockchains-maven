@@ -78,10 +78,10 @@ public class Block {
       this.blockData = transaction;
       this.prevHash = prevBlockHash;
       this.checker = check;
-      computeBase();
       this.currentHash = new Hash(new byte[0]);
       while (!this.checker.isValid(currentHash)) {
         this.nonce = rand.nextLong();
+        this.md.reset();
         computeHash();
       } //while
     } catch (NoSuchAlgorithmException e) {
@@ -108,7 +108,6 @@ public class Block {
       this.blockData = transaction;
       this.prevHash = prevBlockHash;
       this.nonce = blockNonce;
-      computeBase();
       computeHash();
     } catch (NoSuchAlgorithmException e) {
       System.err.println("Algorithm not found (should never happen)");
@@ -124,18 +123,6 @@ public class Block {
    * stored in the block.
    */
   void computeHash() throws NoSuchAlgorithmException {
-    this.md.reset();
-    this.md.update(this.baseHash);
-    longBuffer.clear();
-    this.md.update(longBuffer.putLong(this.nonce).array());
-    this.currentHash = new Hash(md.digest());
-  } // computeHash()
-
-  /**
-   * Compute the base hash to refrain from repeatedly
-   * remaking it in computerHash().
-   */
-  void computeBase() {
     intBuffer.clear();
     this.md.update(intBuffer.putInt(this.index).array());
     this.md.update(this.blockData.getSource().getBytes());
@@ -143,8 +130,10 @@ public class Block {
     intBuffer.clear();
     this.md.update(intBuffer.putInt(this.blockData.getAmount()).array());
     this.md.update(this.prevHash.getBytes());
-    this.baseHash = this.md.digest();
-  } // computeBase()
+    longBuffer.clear();
+    this.md.update(longBuffer.putLong(this.nonce).array());
+    this.currentHash = new Hash(md.digest());
+  } // computeHash()
 
   // +---------+-----------------------------------------------------
   // | Methods |
